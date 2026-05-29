@@ -1,8 +1,66 @@
 {
+  "mods": [
+    {
+      "file": "tracker/Anarchy_Menu-01_Matthew_Simmonds.mod",
+      "title": "Anarchy Menu 01"
+    },
+    {
+      "file": "tracker/BeachHead-2_Matthew_Simmonds.mod",
+      "title": "BeachHead 2"
+    },
+    {
+      "file": "tracker/IntroTune_Matthew_Simmonds.mod",
+      "title": "Intro Tune"
+    },
+    {
+      "file": "tracker/Anarchy_Menu-03_Matthew_Simmonds.mod",
+      "title": "Anarchy Menu 03"
+    },
+    {
+      "file": "tracker/Anarchy_Menu-04_Matthew_Simmonds.mod",
+      "title": "Anarchy Menu 04"
+    },
+    {
+      "file": "tracker/Anarchy_Menu-06_Matthew_Simmonds.mod",
+      "title": "Anarchy Menu 06"
+    },
+    {
+      "file": "tracker/Anarchy_Menu-08_Matthew_Simmonds.mod",
+      "title": "Anarchy Menu 08"
+    },
+    {
+      "file": "tracker/Anarchy_Menu-10_Matthew_Simmonds.mod",
+      "title": "Anarchy Menu 10"
+    },
+    {
+      "file": "tracker/Beach_Party_Matthew_Simmonds.mod",
+      "title": "Beach Party"
+    },
+    {
+      "file": "tracker/Eclipse_Matthew_Simmonds.mod",
+      "title": "Eclipse"
+    },
+    {
+      "file": "tracker/Federation_Matthew_Simmonds.mod",
+      "title": "Federation"
+    },
+    {
+      "file": "tracker/Love_Song_Matthew_Simmonds.mod",
+      "title": "Love Song"
+    },
+    {
+      "file": "tracker/Luna_Waves_Matthew_Simmonds.mod",
+      "title": "Luna Waves"
+    }
+  ],
   "tracks": [
     {
-      "file": "GoldRunner.mp3",
-      "title": "GoldRunner"
+      "file": "demo/GoldRunner_Rob_Hubbard.mp3",
+      "title": "GoldRunner - Rob Hubbard"
+    },
+    {
+      "file": "demo/Station13_Remix_Squeepty.mp3",
+      "title": "Station 13 Remix - Squeepty"
     }
   ]
 }

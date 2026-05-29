@@ -1,0 +1,53 @@
+import type { VectorMesh } from './VectorMesh';
+
+export function createDemoVectorShipMesh(): VectorMesh {
+  return {
+    vertices: [
+      { x: 0, y: 0.72, z: -1.42 },
+      { x: -0.78, y: -0.42, z: -0.62 },
+      { x: 0.78, y: -0.42, z: -0.62 },
+      { x: 0, y: 0.16, z: 1.18 },
+      { x: -1.48, y: -0.58, z: 0.54 },
+      { x: 1.48, y: -0.58, z: 0.54 },
+      { x: 0, y: -0.98, z: 0.84 },
+      { x: -0.42, y: 0.12, z: 0.18 },
+      { x: 0.42, y: 0.12, z: 0.18 },
+      { x: 0, y: 0.9, z: 0.34 },
+    ],
+    faces: [
+      { indices: [0, 1, 7], fill: '#38f0c4', stroke: '#e7fff4' },
+      { indices: [0, 8, 2], fill: '#46a4ff', stroke: '#e7fff4' },
+      { indices: [0, 7, 9, 8], fill: '#ffd45d', stroke: '#fff6b8' },
+      { indices: [7, 1, 6], fill: '#ff5f95', stroke: '#ffe5f0' },
+      { indices: [8, 6, 2], fill: '#9a71ff', stroke: '#efe8ff' },
+      { indices: [7, 6, 8, 9], fill: '#2ad6aa', stroke: '#e7fff4' },
+      { indices: [1, 4, 6], fill: '#2458d9', stroke: '#d8e6ff' },
+      { indices: [2, 6, 5], fill: '#2458d9', stroke: '#d8e6ff' },
+      { indices: [3, 4, 1], fill: '#f04f79', stroke: '#ffe5f0' },
+      { indices: [3, 2, 5], fill: '#ff944d', stroke: '#fff1d9' },
+      { indices: [3, 6, 4], fill: '#28d7a6', stroke: '#e7fff4' },
+      { indices: [3, 5, 6], fill: '#28d7a6', stroke: '#e7fff4' },
+    ],
+    edges: [
+      [0, 1],
+      [0, 2],
+      [0, 7],
+      [0, 8],
+      [0, 9],
+      [1, 4],
+      [1, 6],
+      [1, 7],
+      [2, 5],
+      [2, 6],
+      [2, 8],
+      [3, 4],
+      [3, 5],
+      [3, 6],
+      [4, 6],
+      [5, 6],
+      [7, 8],
+      [7, 9],
+      [8, 9],
+    ],
+  };
+}

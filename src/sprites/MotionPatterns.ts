@@ -83,6 +83,34 @@ export function createSchoolPattern(speed: number, spread: number): SpriteMotion
   };
 }
 
+export function createDepthStarfieldPattern(speed: number): SpriteMotionPattern {
+  return ({ index, total, elapsedTime }) => {
+    const seed = pseudoRandom(index + 1);
+    const phase = (elapsedTime * speed + seed + index / total) % 1;
+    const depth = phase * phase;
+    const angle = index * 2.399963 + seed * Math.PI * 2 + Math.sin(elapsedTime * 0.4 + index) * 0.08;
+    const radiusX = 8 + depth * VIRTUAL_WIDTH * 0.72;
+    const radiusY = 5 + depth * MAIN_AREA_HEIGHT * 0.68;
+    const x = VIRTUAL_WIDTH / 2 + Math.cos(angle) * radiusX;
+    const y = MAIN_AREA_HEIGHT / 2 + Math.sin(angle) * radiusY;
+    const streak = Math.min(1, phase * 1.35);
+
+    return {
+      x,
+      y,
+      rotation: angle,
+      scale: 0.22 + streak * 1.45,
+      alpha: 0.18 + streak * 0.78,
+    };
+  };
+}
+
 function wrap(value: number, size: number): number {
   return ((value % size) + size) % size;
+}
+
+function pseudoRandom(seed: number): number {
+  const value = Math.sin(seed * 12.9898) * 43758.5453;
+
+  return value - Math.floor(value);
 }

@@ -12,6 +12,8 @@ export class SpriteSystem {
   private readonly effects: SpriteEffect[] = [];
   private activeEffectIndex = 0;
   private effectTimer = 0;
+  private initialEffectCount = 0;
+  private initialCycleComplete = false;
   private readonly effectDuration = 10;
 
   add(sprite: Sprite): void {
@@ -22,11 +24,13 @@ export class SpriteSystem {
     this.effects.push(effect);
   }
 
-  setEffects(effects: SpriteEffect[]): void {
+  setEffects(effects: SpriteEffect[], initialEffectCount = effects.length): void {
     this.effects.length = 0;
     this.effects.push(...effects);
     this.activeEffectIndex = 0;
     this.effectTimer = 0;
+    this.initialEffectCount = Math.max(0, Math.min(initialEffectCount, effects.length));
+    this.initialCycleComplete = this.initialEffectCount >= effects.length;
   }
 
   getActiveEffectName(): string {
@@ -41,7 +45,7 @@ export class SpriteSystem {
 
       if (this.effectTimer >= this.effectDuration) {
         this.effectTimer -= this.effectDuration;
-        this.activeEffectIndex = (this.activeEffectIndex + 1) % this.effects.length;
+        this.activeEffectIndex = this.getNextEffectIndex();
         activeEffect = this.effects[this.activeEffectIndex];
       }
 
@@ -73,5 +77,17 @@ export class SpriteSystem {
     }
 
     ctx.restore();
+  }
+
+  private getNextEffectIndex(): number {
+    const effectLimit = this.initialCycleComplete ? this.effects.length : this.initialEffectCount;
+    const nextIndex = this.activeEffectIndex + 1;
+
+    if (nextIndex < effectLimit) {
+      return nextIndex;
+    }
+
+    this.initialCycleComplete = true;
+    return 0;
   }
 }

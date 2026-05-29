@@ -8,6 +8,7 @@ export class PerformanceMonitor {
   private fps = 0;
   private frameMs = 0;
   private effectName = 'None';
+  private vectorScreenName = 'None';
   private spritePatternName = 'None';
   private imageName = 'None';
   private musicTrackName = 'None';
@@ -45,6 +46,11 @@ export class PerformanceMonitor {
     this.render();
   }
 
+  setVectorScreenName(vectorScreenName: string): void {
+    this.vectorScreenName = vectorScreenName;
+    this.render();
+  }
+
   setSpritePatternName(spritePatternName: string): void {
     this.spritePatternName = spritePatternName;
     this.render();
@@ -63,6 +69,6 @@ export class PerformanceMonitor {
   private render(): void {
     const fpsLabel = this.fps > 0 ? this.fps.toFixed(0) : '--';
 
-    this.textNode.nodeValue = `FPS ${fpsLabel} | frame ${this.frameMs.toFixed(1)}ms | budget ${FRAME_BUDGET_MS.toFixed(1)}ms | image ${this.imageName} | effect ${this.effectName} | sprites ${this.spritePatternName} | track ${this.musicTrackName}`;
+    this.textNode.nodeValue = `FPS ${fpsLabel} | frame ${this.frameMs.toFixed(1)}ms | budget ${FRAME_BUDGET_MS.toFixed(1)}ms | image ${this.imageName} | effect ${this.effectName} | vector ${this.vectorScreenName} | sprites ${this.spritePatternName} | track ${this.musicTrackName}`;
   }
 }

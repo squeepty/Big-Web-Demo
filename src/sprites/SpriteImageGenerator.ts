@@ -10,6 +10,12 @@ export class SpriteImageGenerator {
     ];
   }
 
+  static createMysterySet(): SpriteImage[] {
+    return [
+      this.createMysteryNote('mystery-note'),
+    ];
+  }
+
   private static createStar(id: string, fill: string, glow: string): SpriteImage {
     const canvas = this.createCanvas(17, 17);
     const ctx = this.getContext(canvas);
@@ -91,6 +97,25 @@ export class SpriteImageGenerator {
     ctx.fill();
     ctx.fillStyle = highlight;
     ctx.fillRect(7, 3, 2, 5);
+
+    return { id, canvas, width: canvas.width, height: canvas.height };
+  }
+
+  private static createMysteryNote(id: string): SpriteImage {
+    const canvas = this.createCanvas(17, 19);
+    const ctx = this.getContext(canvas);
+
+    ctx.shadowColor = '#f08b5f';
+    ctx.shadowBlur = 5;
+    ctx.fillStyle = '#f7d35d';
+    ctx.fillRect(9, 2, 3, 12);
+    ctx.fillRect(11, 2, 4, 2);
+    ctx.fillRect(11, 5, 4, 2);
+    ctx.fillStyle = '#f08b5f';
+    ctx.fillRect(4, 12, 7, 5);
+    ctx.fillRect(3, 14, 9, 3);
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(7, 13, 2, 1);
 
     return { id, canvas, width: canvas.width, height: canvas.height };
   }

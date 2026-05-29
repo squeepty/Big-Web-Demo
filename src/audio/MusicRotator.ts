@@ -1,16 +1,20 @@
 export type MusicTrack = {
   src: string;
   title: string;
+  file: string;
 };
 
 export class MusicRotator {
   private readonly audio = new Audio();
   private tracks: MusicTrack[] = [];
   private trackIndex = 0;
+  private loadedTrackIndex = -1;
   private playAttemptInProgress = false;
   private trackErrorCount = 0;
 
   constructor() {
+    this.audio.autoplay = false;
+    this.audio.loop = false;
     this.audio.preload = 'auto';
     this.audio.volume = 0.7;
     this.audio.addEventListener('ended', this.handleTrackEnded);
@@ -20,6 +24,7 @@ export class MusicRotator {
   setTracks(tracks: MusicTrack[]): void {
     this.tracks = tracks;
     this.trackIndex = 0;
+    this.loadedTrackIndex = -1;
     this.trackErrorCount = 0;
     this.loadCurrentTrack();
   }
@@ -39,8 +44,18 @@ export class MusicRotator {
     }
   }
 
-  getCurrentTrackName(): string {
-    return this.tracks[this.trackIndex]?.title ?? 'None';
+  getCurrentTrackDebugLabel(): string {
+    const track = this.tracks[this.trackIndex];
+
+    if (!track) {
+      return 'None --:--/--:--';
+    }
+
+    return `${this.getFileName(track.file)} ${this.formatTime(this.audio.currentTime)}/${this.formatTime(this.audio.duration)}`;
+  }
+
+  private getFileName(file: string): string {
+    return file.split('/').pop() ?? file;
   }
 
   private async rotateToNextTrack(): Promise<void> {
@@ -64,12 +79,13 @@ export class MusicRotator {
   private loadCurrentTrack(): void {
     const track = this.tracks[this.trackIndex];
 
-    if (!track || this.audio.src.endsWith(track.src)) {
+    if (!track || this.loadedTrackIndex === this.trackIndex) {
       return;
     }
 
     this.audio.src = track.src;
     this.audio.load();
+    this.loadedTrackIndex = this.trackIndex;
   }
 
   private readonly handleTrackEnded = (): void => {
@@ -87,5 +103,17 @@ export class MusicRotator {
 
   private isAutoplayBlocked(error: unknown): boolean {
     return error instanceof DOMException && error.name === 'NotAllowedError';
+  }
+
+  private formatTime(seconds: number): string {
+    if (!Number.isFinite(seconds) || seconds < 0) {
+      return '--:--';
+    }
+
+    const totalSeconds = Math.floor(seconds);
+    const minutes = Math.floor(totalSeconds / 60);
+    const remainingSeconds = totalSeconds % 60;
+
+    return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
   }
 }
