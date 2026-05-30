@@ -84,7 +84,8 @@ in virtual canvas coordinates.
 
 ## Scroller Refresh
 
-The scroller message is loaded from `public/text/scroller-message.txt` and is
+The scroller message is loaded from `public/text/scroller-message.txt` during
+page setup, loaded again immediately when the user enters the demo, and then
 refreshed every `2` seconds while the demo runs. The fetch uses `cache:
 no-store` plus a timestamp query so local edits can appear without a rebuild.
 

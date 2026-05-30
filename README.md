@@ -92,7 +92,9 @@ npm run cleanbuild
 The demo scroller fetches `/text/scroller-message.txt`. In local dev and
 preview, that route is served directly from `public/text/scroller-message.txt`
 with no-store cache headers, so the text rendered by the demo is the file you
-edit.
+edit. Production builds also copy that source file into
+`dist/text/scroller-message.txt` after bundling, keeping the public text file as
+the source of truth.
 
 ## Assets
 

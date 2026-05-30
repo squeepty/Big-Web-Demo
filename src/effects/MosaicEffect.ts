@@ -3,9 +3,20 @@ import type { Effect } from './Effect';
 
 export class MosaicEffect implements Effect {
   readonly name = 'Mosaic';
+  private readonly mosaicCanvas = document.createElement('canvas');
+  private readonly mosaicCtx: CanvasRenderingContext2D;
   private elapsedTime = 0;
 
-  constructor(private readonly image: CanvasImageSource) {}
+  constructor(private readonly image: CanvasImageSource) {
+    const mosaicCtx = this.mosaicCanvas.getContext('2d');
+
+    if (!mosaicCtx) {
+      throw new Error('Could not create mosaic effect canvas.');
+    }
+
+    mosaicCtx.imageSmoothingEnabled = false;
+    this.mosaicCtx = mosaicCtx;
+  }
 
   update(deltaTime: number, _elapsedTime: number): void {
     this.elapsedTime += deltaTime;
@@ -17,23 +28,32 @@ export class MosaicEffect implements Effect {
 
     ctx.imageSmoothingEnabled = false;
 
-    for (let y = 0; y < MAIN_AREA_HEIGHT; y += blockSize) {
-      for (let x = 0; x < VIRTUAL_WIDTH; x += blockSize) {
-        const width = Math.min(blockSize, VIRTUAL_WIDTH - x);
-        const height = Math.min(blockSize, MAIN_AREA_HEIGHT - y);
-
-        ctx.drawImage(
-          this.image,
-          x,
-          y,
-          1,
-          1,
-          x,
-          MAIN_AREA_Y + y,
-          width,
-          height,
-        );
-      }
+    if (blockSize === 1) {
+      ctx.drawImage(this.image, 0, MAIN_AREA_Y, VIRTUAL_WIDTH, MAIN_AREA_HEIGHT);
+      return;
     }
+
+    const columns = Math.ceil(VIRTUAL_WIDTH / blockSize);
+    const rows = Math.ceil(MAIN_AREA_HEIGHT / blockSize);
+
+    if (this.mosaicCanvas.width !== columns || this.mosaicCanvas.height !== rows) {
+      this.mosaicCanvas.width = columns;
+      this.mosaicCanvas.height = rows;
+      this.mosaicCtx.imageSmoothingEnabled = false;
+    }
+
+    this.mosaicCtx.clearRect(0, 0, columns, rows);
+    this.mosaicCtx.drawImage(
+      this.image,
+      0,
+      0,
+      VIRTUAL_WIDTH,
+      MAIN_AREA_HEIGHT,
+      0,
+      0,
+      columns,
+      rows,
+    );
+    ctx.drawImage(this.mosaicCanvas, 0, MAIN_AREA_Y, VIRTUAL_WIDTH, MAIN_AREA_HEIGHT);
   }
 }

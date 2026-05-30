@@ -1,5 +1,5 @@
-import { resolve } from 'node:path';
-import { readFile } from 'node:fs/promises';
+import { dirname, resolve } from 'node:path';
+import { copyFile, mkdir, readFile } from 'node:fs/promises';
 import { defineConfig, type Plugin } from 'vite';
 
 const scrollerTextRoute = '/text/scroller-message.txt';
@@ -28,6 +28,27 @@ function serveLiveScrollerText(): Plugin {
       server.middlewares.use(
         createScrollerTextMiddleware(scrollerTextPath),
       );
+    },
+  };
+}
+
+function syncScrollerTextToDist(): Plugin {
+  let root = process.cwd();
+  let outDir = 'dist';
+
+  return {
+    name: 'sync-scroller-text-to-dist',
+    apply: 'build',
+    configResolved(config) {
+      root = config.root;
+      outDir = config.build.outDir;
+    },
+    async closeBundle() {
+      const sourcePath = resolve(root, scrollerTextFile);
+      const outputPath = resolve(root, outDir, scrollerTextRoute.slice(1));
+
+      await mkdir(dirname(outputPath), { recursive: true });
+      await copyFile(sourcePath, outputPath);
     },
   };
 }
@@ -67,7 +88,7 @@ function getRequestPath(url: string | undefined): string {
 }
 
 export default defineConfig({
-  plugins: [serveLiveScrollerText()],
+  plugins: [serveLiveScrollerText(), syncScrollerTextToDist()],
   server: {
     open: false,
   },

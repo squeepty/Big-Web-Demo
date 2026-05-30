@@ -105,6 +105,7 @@ export class DemoApp {
   private demoStarted = false;
   private musicStartRequested = false;
   private scrollerMessage = '';
+  private scrollerMessageRequestId = 0;
   private scrollerMessageRefreshTimer = 0;
   private scrollerMessageRefreshInProgress = false;
   private startPrompt: HTMLDivElement | null = null;
@@ -351,6 +352,7 @@ export class DemoApp {
     this.stopStartPromptAnimation();
     this.startPrompt?.remove();
     this.startPrompt = null;
+    await this.reloadScrollerMessage();
     window.addEventListener('keydown', this.handleKeyDown);
     window.addEventListener('pointerdown', this.handlePointerDown);
     this.performanceMonitor.setVisible(this.debugVisible);
@@ -729,9 +731,16 @@ export class DemoApp {
 
   private async fetchScrollerMessage(): Promise<string | null> {
     try {
-      const response = await fetch(`/text/scroller-message.txt?time=${Date.now()}`, {
-        cache: 'no-store',
-      });
+      this.scrollerMessageRequestId += 1;
+      const response = await fetch(
+        `/text/scroller-message.txt?time=${Date.now()}-${this.scrollerMessageRequestId}`,
+        {
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache',
+          },
+        },
+      );
 
       if (!response.ok) {
         return null;
@@ -763,17 +772,21 @@ export class DemoApp {
 
   private async refreshScrollerMessage(): Promise<void> {
     try {
-      const message = await this.fetchScrollerMessage();
-
-      if (!message || message === this.scrollerMessage) {
-        return;
-      }
-
-      this.scrollerMessage = message;
-      this.scroller?.setMessage(message);
+      await this.reloadScrollerMessage();
     } finally {
       this.scrollerMessageRefreshInProgress = false;
     }
+  }
+
+  private async reloadScrollerMessage(): Promise<void> {
+    const message = await this.fetchScrollerMessage();
+
+    if (!message || message === this.scrollerMessage) {
+      return;
+    }
+
+    this.scrollerMessage = message;
+    this.scroller?.setMessage(message);
   }
 
   private isAutoplayBlocked(error: unknown): boolean {
