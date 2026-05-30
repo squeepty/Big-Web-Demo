@@ -8,18 +8,56 @@ if (!mountNode) {
   throw new Error('Could not find #app mount node.');
 }
 
+const appMountNode = mountNode;
+
+type RunningApp = DemoApp | SecretTrackerPage;
+
+let runningApp: RunningApp | null = null;
+
 if (isSecretTrackerRoute()) {
-  const tracker = new SecretTrackerPage(mountNode);
-
-  tracker.start().catch((error: unknown) => {
-    console.error('Secret tracker failed to start.', error);
-  });
+  void showTracker();
 } else {
-  const demo = new DemoApp(mountNode);
+  void showDemo();
+}
 
-  demo.start().catch((error: unknown) => {
+window.addEventListener('hashchange', () => {
+  if (isSecretTrackerRoute() && !(runningApp instanceof SecretTrackerPage)) {
+    void showTracker();
+  }
+});
+
+async function showDemo(): Promise<void> {
+  runningApp?.destroy();
+  const demo = new DemoApp(appMountNode, showTrackerRoute);
+
+  runningApp = demo;
+
+  try {
+    await demo.start();
+  } catch (error: unknown) {
     console.error('The Big (Web) Demo failed to start.', error);
-  });
+  }
+}
+
+async function showTracker(): Promise<void> {
+  runningApp?.destroy();
+  const tracker = new SecretTrackerPage(appMountNode);
+
+  runningApp = tracker;
+
+  try {
+    await tracker.start();
+  } catch (error: unknown) {
+    console.error('Secret tracker failed to start.', error);
+  }
+}
+
+function showTrackerRoute(): void {
+  if (window.location.hash.toLowerCase() !== '#tracker') {
+    window.history.pushState(null, '', `${import.meta.env.BASE_URL}#tracker`);
+  }
+
+  void showTracker();
 }
 
 function isSecretTrackerRoute(): boolean {

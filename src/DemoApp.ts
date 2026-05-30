@@ -66,6 +66,7 @@ type VectorDemoScreen = {
 };
 
 type DemoScreen = ImageDemoScreen | VectorDemoScreen;
+type TrackerRequestHandler = () => void;
 
 export class DemoApp {
   private readonly renderer: Renderer;
@@ -109,6 +110,8 @@ export class DemoApp {
   private scrollerMessageRequestId = 0;
   private scrollerMessageRefreshTimer = 0;
   private scrollerMessageRefreshInProgress = false;
+  private animationId: number | null = null;
+  private destroyed = false;
   private startPrompt: HTMLDivElement | null = null;
   private startPromptAnimationId: number | null = null;
   private startPromptCanvas: HTMLCanvasElement | null = null;
@@ -120,7 +123,7 @@ export class DemoApp {
   private readonly scrollerMessageRefreshInterval = 2;
   private readonly originalPublicImageCount = 8;
 
-  constructor(parent: HTMLElement) {
+  constructor(parent: HTMLElement, private readonly onTrackerRequested?: TrackerRequestHandler) {
     this.renderer = new Renderer(parent);
     this.performanceMonitor = new PerformanceMonitor(this.renderer.stage);
     this.splashImages = SplashImageGenerator.createIntroSet();
@@ -129,6 +132,25 @@ export class DemoApp {
       createIntroSpriteEffects(SpriteImageGenerator.createIntroSet()),
       4,
     );
+  }
+
+  destroy(): void {
+    this.destroyed = true;
+    this.stopStartPromptAnimation();
+    this.startPrompt?.removeEventListener('pointerdown', this.handleStartPromptPointerDown);
+    this.startPrompt?.removeEventListener('keydown', this.handleStartPromptKeyDown);
+    this.startPrompt?.remove();
+    this.startPrompt = null;
+
+    if (this.animationId !== null) {
+      cancelAnimationFrame(this.animationId);
+      this.animationId = null;
+    }
+
+    window.removeEventListener('keydown', this.handleKeyDown);
+    window.removeEventListener('pointerdown', this.handlePointerDown);
+    this.musicRotator.dispose();
+    this.renderer.destroy();
   }
 
   async start(): Promise<void> {
@@ -358,7 +380,7 @@ export class DemoApp {
     window.addEventListener('pointerdown', this.handlePointerDown);
     this.performanceMonitor.setVisible(this.debugVisible);
     await this.startMusic();
-    requestAnimationFrame(this.loop);
+    this.animationId = requestAnimationFrame(this.loop);
   }
 
   private stopStartPromptAnimation(): void {
@@ -373,12 +395,16 @@ export class DemoApp {
   }
 
   private readonly loop = (timestamp: number): void => {
+    if (this.destroyed) {
+      return;
+    }
+
     const { deltaTime, elapsedTime } = this.time.tick(timestamp);
 
     this.update(deltaTime, elapsedTime);
     this.render(elapsedTime);
 
-    requestAnimationFrame(this.loop);
+    this.animationId = requestAnimationFrame(this.loop);
   };
 
   private update(deltaTime: number, elapsedTime: number): void {
@@ -447,7 +473,7 @@ export class DemoApp {
     const [x, y] = this.getVirtualPoint(event);
 
     if (this.secretTrackerSprite.containsPoint(x, y)) {
-      window.location.href = `${import.meta.env.BASE_URL}#tracker`;
+      this.onTrackerRequested?.();
     }
   };
 

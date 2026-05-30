@@ -32,4 +32,8 @@ export class Renderer {
     this.ctx.fillStyle = color;
     this.ctx.fillRect(0, 0, VIRTUAL_WIDTH, VIRTUAL_HEIGHT);
   }
+
+  destroy(): void {
+    this.stage.remove();
+  }
 }

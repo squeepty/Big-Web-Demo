@@ -74,6 +74,8 @@ export class SecretTrackerPage {
   private statusMessage = 'SCANNING /AUDIO';
   private previousTimestamp = 0;
   private elapsedTime = 0;
+  private animationId: number | null = null;
+  private destroyed = false;
   private backdropFiles: string[] = [];
   private currentBackdropFile: string | null = null;
   private backdropImage: HTMLImageElement | null = null;
@@ -90,6 +92,20 @@ export class SecretTrackerPage {
       };
       this.isPlaying = state.isPlaying;
     });
+  }
+
+  destroy(): void {
+    this.destroyed = true;
+    this.renderer.canvas.removeEventListener('pointerdown', this.handlePointerDown);
+    window.removeEventListener('keydown', this.handleKeyDown);
+
+    if (this.animationId !== null) {
+      cancelAnimationFrame(this.animationId);
+      this.animationId = null;
+    }
+
+    this.player.stop();
+    this.renderer.destroy();
   }
 
   async start(): Promise<void> {
@@ -111,15 +127,19 @@ export class SecretTrackerPage {
       await this.playSelectedSong(false);
     }
 
-    requestAnimationFrame(this.loop);
+    this.animationId = requestAnimationFrame(this.loop);
   }
 
   private readonly loop = (timestamp: number): void => {
+    if (this.destroyed) {
+      return;
+    }
+
     const deltaTime = this.previousTimestamp === 0 ? 0 : (timestamp - this.previousTimestamp) / 1000;
     this.previousTimestamp = timestamp;
     this.elapsedTime += deltaTime;
     this.render();
-    requestAnimationFrame(this.loop);
+    this.animationId = requestAnimationFrame(this.loop);
   };
 
   private render(): void {

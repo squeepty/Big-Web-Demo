@@ -54,6 +54,14 @@ export class MusicRotator {
     return `${this.getFileName(track.file)} ${this.formatTime(this.audio.currentTime)}/${this.formatTime(this.audio.duration)}`;
   }
 
+  dispose(): void {
+    this.audio.pause();
+    this.audio.removeAttribute('src');
+    this.audio.load();
+    this.audio.removeEventListener('ended', this.handleTrackEnded);
+    this.audio.removeEventListener('error', this.handleTrackError);
+  }
+
   private getFileName(file: string): string {
     return file.split('/').pop() ?? file;
   }
