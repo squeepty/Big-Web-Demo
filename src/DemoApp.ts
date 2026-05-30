@@ -114,6 +114,7 @@ export class DemoApp {
   private startPromptStartTimestamp = 0;
   private startPromptLastTimestamp = 0;
   private readonly slideDuration = 5;
+  private readonly vectorSlideDurationMultiplier = 3;
   private readonly scrollerMessageRefreshInterval = 2;
   private readonly originalPublicImageCount = 8;
 
@@ -780,14 +781,26 @@ export class DemoApp {
   }
 
   private updateSlide(deltaTime: number): void {
+    const activeSlideDuration = this.getActiveSlideDuration();
+
     this.slideTimer += deltaTime;
 
-    if (this.slideTimer < this.slideDuration) {
+    if (this.slideTimer < activeSlideDuration) {
       return;
     }
 
-    this.slideTimer -= this.slideDuration;
+    this.slideTimer -= activeSlideDuration;
     this.setActiveSlide((this.slideIndex + 1) % this.slides.length);
+  }
+
+  private getActiveSlideDuration(): number {
+    const activeScreen = this.slides[this.slideIndex];
+
+    if (activeScreen?.kind === 'vector') {
+      return this.slideDuration * this.vectorSlideDurationMultiplier;
+    }
+
+    return this.slideDuration;
   }
 
   private setActiveSlide(index: number): void {

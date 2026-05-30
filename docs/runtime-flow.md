@@ -56,10 +56,11 @@ Each frame:
    or the active vector screen, draws sprites and the secret trigger sprite,
    then draws the scroller.
 
-The active screen changes every `5` seconds. The first rotation contains the
-original image sequence unchanged. The second rotation repeats the image
-sequence with vector screens distributed through it. The active sprite effect
-changes inside `SpriteSystem` every `10` seconds.
+Image screens change every `5` seconds, while vector 3D screens stay active for
+`15` seconds. The first rotation contains the original image sequence unchanged.
+The second rotation repeats the image sequence with vector screens distributed
+through it. The active sprite effect changes inside `SpriteSystem` every `10`
+seconds.
 
 ## Start Prompt Animation
 
