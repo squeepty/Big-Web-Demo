@@ -2,6 +2,7 @@ import { dirname, resolve } from 'node:path';
 import { copyFile, mkdir, readFile } from 'node:fs/promises';
 import { defineConfig, type Plugin } from 'vite';
 
+const githubPagesBase = '/Big-Web-Demo/';
 const scrollerTextRoute = '/text/scroller-message.txt';
 const scrollerTextFile = 'public/text/scroller-message.txt';
 
@@ -13,8 +14,12 @@ function serveLiveScrollerText(): Plugin {
         server.config.root,
         scrollerTextFile,
       );
+      const scrollerTextRoutes = getPublicRouteCandidates(
+        server.config.base,
+        scrollerTextRoute,
+      );
 
-      server.middlewares.use(createScrollerTextMiddleware(scrollerTextPath));
+      server.middlewares.use(createScrollerTextMiddleware(scrollerTextPath, scrollerTextRoutes));
       server.watcher.add(scrollerTextPath);
       server.watcher.on('change', (changedPath) => {
         if (changedPath === scrollerTextPath) {
@@ -24,9 +29,13 @@ function serveLiveScrollerText(): Plugin {
     },
     configurePreviewServer(server) {
       const scrollerTextPath = resolve(server.config.root, scrollerTextFile);
+      const scrollerTextRoutes = getPublicRouteCandidates(
+        server.config.base,
+        scrollerTextRoute,
+      );
 
       server.middlewares.use(
-        createScrollerTextMiddleware(scrollerTextPath),
+        createScrollerTextMiddleware(scrollerTextPath, scrollerTextRoutes),
       );
     },
   };
@@ -53,13 +62,35 @@ function syncScrollerTextToDist(): Plugin {
   };
 }
 
-function createScrollerTextMiddleware(scrollerTextPath: string) {
+function copyIndexTo404(): Plugin {
+  let root = process.cwd();
+  let outDir = 'dist';
+
+  return {
+    name: 'copy-index-to-404',
+    apply: 'build',
+    configResolved(config) {
+      root = config.root;
+      outDir = config.build.outDir;
+    },
+    async closeBundle() {
+      const outputRoot = resolve(root, outDir);
+
+      await copyFile(
+        resolve(outputRoot, 'index.html'),
+        resolve(outputRoot, '404.html'),
+      );
+    },
+  };
+}
+
+function createScrollerTextMiddleware(scrollerTextPath: string, routes: Set<string>) {
   return async (
     req: import('node:http').IncomingMessage,
     res: import('node:http').ServerResponse,
     next: () => void,
   ): Promise<void> => {
-    if (getRequestPath(req.url) !== scrollerTextRoute) {
+    if (!routes.has(getRequestPath(req.url))) {
       next();
       return;
     }
@@ -79,6 +110,18 @@ function createScrollerTextMiddleware(scrollerTextPath: string) {
   };
 }
 
+function getPublicRouteCandidates(base: string, route: string): Set<string> {
+  const normalizedRoute = route.startsWith('/') ? route : `/${route}`;
+  const normalizedBase = `/${base.replace(/^\/+|\/+$/g, '')}`;
+  const routes = new Set([normalizedRoute]);
+
+  if (normalizedBase !== '/') {
+    routes.add(`${normalizedBase}${normalizedRoute}`);
+  }
+
+  return routes;
+}
+
 function getRequestPath(url: string | undefined): string {
   if (!url) {
     return '';
@@ -88,7 +131,8 @@ function getRequestPath(url: string | undefined): string {
 }
 
 export default defineConfig({
-  plugins: [serveLiveScrollerText(), syncScrollerTextToDist()],
+  base: githubPagesBase,
+  plugins: [serveLiveScrollerText(), syncScrollerTextToDist(), copyIndexTo404()],
   server: {
     open: false,
   },

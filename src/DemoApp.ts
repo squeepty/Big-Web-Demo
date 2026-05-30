@@ -1,6 +1,7 @@
 import { PerformanceMonitor } from './PerformanceMonitor';
 import { Renderer } from './Renderer';
 import { MAIN_AREA_HEIGHT, VIRTUAL_HEIGHT, VIRTUAL_WIDTH } from './constants';
+import { getPublicAssetUrl } from './publicPath';
 import { AssetLoader } from './assets/AssetLoader';
 import { SplashImageGenerator, type ImageEffectKind, type SplashImage } from './assets/SplashImageGenerator';
 import { CheckerRevealEffect } from './effects/CheckerRevealEffect';
@@ -446,7 +447,7 @@ export class DemoApp {
     const [x, y] = this.getVirtualPoint(event);
 
     if (this.secretTrackerSprite.containsPoint(x, y)) {
-      window.location.href = '/tracker';
+      window.location.href = `${import.meta.env.BASE_URL}#tracker`;
     }
   };
 
@@ -472,7 +473,7 @@ export class DemoApp {
 
   private async loadPublicImages(): Promise<SplashImage[]> {
     try {
-      const response = await fetch('/images/manifest.json');
+      const response = await fetch(getPublicAssetUrl('images/manifest.json'));
 
       if (!response.ok) {
         return [];
@@ -491,7 +492,7 @@ export class DemoApp {
 
   private async loadMusicTracks(): Promise<MusicTrack[]> {
     try {
-      const response = await fetch('/audio/manifest.json', {
+      const response = await fetch(getPublicAssetUrl('audio/manifest.json'), {
         cache: 'no-store',
       });
 
@@ -534,14 +535,10 @@ export class DemoApp {
     }
 
     return {
-      src: `/audio/${this.encodePublicPath(file)}`,
+      src: getPublicAssetUrl(`audio/${file}`),
       title: typeof track === 'string' ? this.createTrackTitle(file) : track.title ?? this.createTrackTitle(file),
       file,
     };
-  }
-
-  private encodePublicPath(path: string): string {
-    return path.split('/').map((part) => encodeURIComponent(part)).join('/');
   }
 
   private createTrackTitle(file: string): string {
@@ -562,7 +559,7 @@ export class DemoApp {
   }
 
   private async loadPublicImage(file: string): Promise<SplashImage | null> {
-    const src = `/images/${file}`;
+    const src = getPublicAssetUrl(`images/${file}`);
 
     try {
       const asset = await this.assetLoader.loadImage(file, src);
@@ -733,7 +730,7 @@ export class DemoApp {
     try {
       this.scrollerMessageRequestId += 1;
       const response = await fetch(
-        `/text/scroller-message.txt?time=${Date.now()}-${this.scrollerMessageRequestId}`,
+        `${getPublicAssetUrl('text/scroller-message.txt')}?time=${Date.now()}-${this.scrollerMessageRequestId}`,
         {
           cache: 'no-store',
           headers: {

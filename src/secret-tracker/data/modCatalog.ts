@@ -1,3 +1,5 @@
+import { getPublicAssetUrl } from '../../publicPath';
+
 export type ModCatalogEntry = {
   file: string;
   title: string;
@@ -15,7 +17,7 @@ type AudioManifest = AudioManifestEntry[] | {
 };
 
 export async function loadModCatalog(): Promise<ModCatalogEntry[]> {
-  const response = await fetch('/audio/manifest.json');
+  const response = await fetch(getPublicAssetUrl('audio/manifest.json'));
 
   if (!response.ok) {
     return [];

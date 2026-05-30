@@ -1,5 +1,6 @@
 import { Renderer } from '../Renderer';
 import { VIRTUAL_HEIGHT, VIRTUAL_WIDTH } from '../constants';
+import { getPublicAssetUrl } from '../publicPath';
 import { LissajousSpriteOverlay } from './LissajousSpriteOverlay';
 import { SimpleModPlayer } from './audio/SimpleModPlayer';
 import { ModParser } from './core/ModParser';
@@ -151,7 +152,7 @@ export class SecretTrackerPage {
     this.render();
 
     try {
-      const response = await fetch(`/audio/${entry.file}`);
+      const response = await fetch(getPublicAssetUrl(`audio/${entry.file}`));
 
       if (!response.ok) {
         throw new Error(`Could not fetch ${entry.file}.`);
@@ -594,7 +595,7 @@ export class SecretTrackerPage {
 
   private async loadBackdropFiles(): Promise<string[]> {
     try {
-      const response = await fetch('/images/manifest.json');
+      const response = await fetch(getPublicAssetUrl('images/manifest.json'));
 
       if (!response.ok) {
         return [];
@@ -620,7 +621,7 @@ export class SecretTrackerPage {
 
     for (const candidate of candidates) {
       try {
-        this.backdropImage = await loadImage(`/images/${candidate}`);
+        this.backdropImage = await loadImage(getPublicAssetUrl(`images/${candidate}`));
         this.currentBackdropFile = candidate;
         return;
       } catch (error) {

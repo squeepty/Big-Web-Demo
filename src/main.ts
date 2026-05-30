@@ -23,8 +23,25 @@ if (isSecretTrackerRoute()) {
 }
 
 function isSecretTrackerRoute(): boolean {
-  const path = window.location.pathname.replace(/\/$/, '').toLowerCase();
+  const path = getRoutePath();
   const hash = window.location.hash.toLowerCase();
 
   return hash === '#tracker' || path === '/tracker' || path === '/secret/tracker';
+}
+
+function getRoutePath(): string {
+  const path = window.location.pathname.replace(/\/$/, '').toLowerCase();
+  const basePath = import.meta.env.BASE_URL
+    .replace(/\/$/, '')
+    .toLowerCase();
+
+  if (basePath && path === basePath) {
+    return '';
+  }
+
+  if (basePath && path.startsWith(`${basePath}/`)) {
+    return path.slice(basePath.length);
+  }
+
+  return path;
 }

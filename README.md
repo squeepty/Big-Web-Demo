@@ -68,13 +68,13 @@ npm run dev
 Open the main demo:
 
 ```text
-http://127.0.0.1:5173/
+http://127.0.0.1:5173/Big-Web-Demo/
 ```
 
 Open the secret tracker directly:
 
 ```text
-http://127.0.0.1:5173/tracker
+http://127.0.0.1:5173/Big-Web-Demo/#tracker
 ```
 
 Build the project:
@@ -95,6 +95,19 @@ with no-store cache headers, so the text rendered by the demo is the file you
 edit. Production builds also copy that source file into
 `dist/text/scroller-message.txt` after bundling, keeping the public text file as
 the source of truth.
+
+## Deploying To GitHub Pages
+
+The project is configured for the repository Pages URL:
+
+```text
+https://squeepty.github.io/Big-Web-Demo/
+```
+
+Deployment uses the workflow in `.github/workflows/deploy.yml`. In GitHub, open
+the repository settings, go to **Pages**, and set **Build and deployment** →
+**Source** to **GitHub Actions**. After that, pushes to `main` will build the
+Vite app and publish `dist/` to GitHub Pages.
 
 ## Assets
 
